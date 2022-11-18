@@ -1,0 +1,16 @@
+scripts:
+- name: My script
+  command: python3 example.py
+  args:
+  - type: string
+    name: Employee name
+    description: the name of the employee to say 'woo' to
+  - type: number
+    name: times
+    description: the number of times to say 'woo'
+- name: My other script
+  command: python3 example2.py
+  args:
+  - type: string
+    name: Friend name
+    description: the name of the friend with the birthday
