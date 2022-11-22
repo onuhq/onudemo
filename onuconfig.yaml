@@ -1,6 +1,7 @@
 scripts:
 - name: My script
   command: python3 example.py
+  description: Prints the name to the console
   args:
   - type: string
     name: Employee name
@@ -8,8 +9,9 @@ scripts:
   - type: number
     name: times
     description: the number of times to say 'woo'
-- name: My other script
+- name: My other script!!
   command: python3 example2.py
+  description: Prints 'happy birthday' to the console
   args:
   - type: string
     name: Friend name
