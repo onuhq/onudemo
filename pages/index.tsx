@@ -19,10 +19,22 @@ interface Step {
 export default function Home() {
 
   const [steps, setSteps] = useState<Array<Step>>([]);
+  const [scenario, setScenario] = useState<Array<Step>>([]);
 
   useEffect(() => {
     setSteps(scriptData.scripts)
   }, [])
+
+  const addToScenario = (step: Step) => {
+    setScenario(scenario.concat([step]))
+  }
+
+  const removeAtIndex = (indexForRemoval: number) => {
+    // Removes the step at the given index
+    const newArray = scenario.slice(0, indexForRemoval).concat(scenario.slice(indexForRemoval + 1))
+    setScenario(newArray);
+  }
+
 
 
   return (
@@ -36,23 +48,45 @@ export default function Home() {
       <main className={styles.main}>
         <div className='flex flex-row justify-start w-full h-full'>
           <div className='border-2 border-transparent border-r-black pr-12'>
+            <p>Steps</p>
             {steps.map((step, i) => {
               return (
                 <div key={`step${i}`} className='bg-gray-100 drop-shadow-lg px-5 py-3 mb-6'>
                   <p className='font-bold mb-2'>{step.name}</p>
                   <p className='italic mb-2'>{step.description}</p>
                   <p className='font-mono mb-4 bg-gray-200 rounded-md px-3 py-1 text-blue-600'>{step.command}</p>
-                  <div className='px-3 py-2 bg-blue-300 rounded-lg'>
+                  <button onClick={() => addToScenario(step)} className='px-3 py-2 bg-blue-300 rounded-lg'>
                     Add
-                  </div>
+                  </button>
                 </div>
               )
             })}
           </div>
           <div>
-            Main content goes here
+            <p>
+              scenario
+            </p>
+            <button className='ml-10 px-3 bg-gray-300 rounded-full'>
+              Run
+            </button>
+            <div>
+              {scenario.map((scenarioStep, i) => {
+                return (
+                  <div key={`step${i}`} className='bg-gray-100 drop-shadow-lg px-5 py-3 mb-6'>
+                    <p className='font-bold mb-2'>{scenarioStep.name}</p>
+                    <p className='italic mb-2'>{scenarioStep.description}</p>
+                    <p className='font-mono mb-4 bg-gray-200 rounded-md px-3 py-1 text-blue-600'>{scenarioStep.command}</p>
+                    <button onClick={() => removeAtIndex(i)} className='px-3 py-2 bg-red-300 rounded-lg'>
+                      remove
+                    </button>
+                  </div>
+                )
+              })}
+            </div>
           </div>
-        </div >
+
+        </div>
+
 
 
       </main >
