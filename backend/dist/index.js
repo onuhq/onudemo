@@ -18,9 +18,14 @@ const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 const body_parser_1 = __importDefault(require("body-parser"));
 const schemas_1 = require("./src/schemas");
+const cors_1 = __importDefault(require("cors"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const port = process.env.PORT;
+// enable cors
+app.use((0, cors_1.default)());
+// @ts-ignore
+app.options('*', (0, cors_1.default)());
 // create application/json parser
 var jsonParser = body_parser_1.default.json();
 app.get('/', (req, res) => {

@@ -5,11 +5,17 @@ const exec = util.promisify(require('child_process').exec);
 import bodyParser, { json } from 'body-parser';
 import { ExecuteCommandType } from './src/generated/interfaces';
 import { ExecuteCommandSchema } from './src/schemas';
+import cors from 'cors';
 
 dotenv.config();
 
 const app: Express = express();
 const port = process.env.PORT;
+
+// enable cors
+app.use(cors());
+// @ts-ignore
+app.options('*', cors());
 
 // create application/json parser
 var jsonParser = bodyParser.json()

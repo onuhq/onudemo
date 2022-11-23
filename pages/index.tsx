@@ -3,11 +3,13 @@ import Image from 'next/image'
 import { useEffect, useState } from 'react';
 import styles from '../styles/Home.module.css'
 import scriptData from '../onuconfig.json'
+import axios from 'axios';
 
 interface CommandArg {
   type: string;
   name: string;
   description: string;
+  value: string | number;
 }
 interface Step {
   name: string;
@@ -16,13 +18,23 @@ interface Step {
   args: Array<CommandArg>;
 }
 
+
 export default function Home() {
 
   const [steps, setSteps] = useState<Array<Step>>([]);
   const [scenario, setScenario] = useState<Array<Step>>([]);
 
   useEffect(() => {
-    setSteps(scriptData.scripts)
+    // add a base value to each script
+    const newScripts: Array<Step> = scriptData.scripts.map(script => {
+      return {
+        name: script.name,
+        description: script.description,
+        command: script.command,
+        args: script.args.map(arg => { return { type: arg.type, description: arg.description, name: arg.name, value: arg.type === "string" ? "" : 0 } })
+      }
+    })
+    setSteps(newScripts);
   }, [])
 
   const addToScenario = (step: Step) => {
@@ -33,6 +45,32 @@ export default function Home() {
     // Removes the step at the given index
     const newArray = scenario.slice(0, indexForRemoval).concat(scenario.slice(indexForRemoval + 1))
     setScenario(newArray);
+  }
+
+  const updateScenarioStepValue = (stepIndex: number, argIndex: number, value: string | number) => {
+    const newArray = scenario.map((scenarioStep, i) => {
+      if (i !== stepIndex) {
+        return scenarioStep;
+      }
+      const updatedStep = Object.assign({}, scenarioStep)
+      updatedStep.args[argIndex].value = value;
+      return updatedStep;
+    })
+    setScenario(newArray)
+
+  }
+
+  const runScenario = async () => {
+    // runs each step in the scenario
+    for (let scenarioStep of scenario) {
+      const data = {
+        command: scenarioStep.command,
+        args: scenarioStep.args.map(arg => { return { type: arg.type, value: arg.value } })
+      }
+      const response = await axios.post('http://localhost:8000/execute', data)
+      console.log('response', response)
+    }
+
   }
 
 
@@ -66,7 +104,7 @@ export default function Home() {
             <p>
               scenario
             </p>
-            <button className='ml-10 px-3 bg-gray-300 rounded-full'>
+            <button onClick={runScenario} className='ml-10 px-3 bg-gray-300 rounded-full'>
               Run
             </button>
             <div>
@@ -75,7 +113,17 @@ export default function Home() {
                   <div key={`step${i}`} className='bg-gray-100 drop-shadow-lg px-5 py-3 mb-6'>
                     <p className='font-bold mb-2'>{scenarioStep.name}</p>
                     <p className='italic mb-2'>{scenarioStep.description}</p>
-                    <p className='font-mono mb-4 bg-gray-200 rounded-md px-3 py-1 text-blue-600'>{scenarioStep.command}</p>
+                    <div className='flex flex-col pt-5'>
+                      {scenarioStep.args?.map((arg, j) => {
+                        return (
+                          <div key={`step${i}arg${j}`} className='mb-5'>
+                            <p className='font-bold text-sm'>{`${arg.name} (${arg.type})`}</p>
+                            <p className='text-sm'>{arg.description}</p>
+                            <input value={arg.value} onChange={(e) => updateScenarioStepValue(i, j, e.target.value)} key={`step${i}arg${j}`} />
+                          </div>
+                        )
+                      })}
+                    </div>
                     <button onClick={() => removeAtIndex(i)} className='px-3 py-2 bg-red-300 rounded-lg'>
                       remove
                     </button>
