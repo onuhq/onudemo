@@ -6,54 +6,83 @@ import scriptData from '../onuconfig.json'
 import axios from 'axios';
 
 interface CommandArg {
+  id: string;
   type: string;
   name: string;
   description: string;
   value: string | number;
 }
 interface Step {
+  id: string;
   name: string;
   description: string;
   command: string;
   args: Array<CommandArg>;
 }
 
+interface StepOutput {
+  stdout: string;
+  stderr: string;
+}
+
+function joinClassNames(...classes: Array<string | boolean | undefined>) {
+  return classes.filter(Boolean).join(' ')
+}
+
+const makeId = (length: number) => {
+  var result = '';
+  var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  var charactersLength = characters.length;
+  for (var i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
+}
 
 export default function Home() {
 
   const [steps, setSteps] = useState<Array<Step>>([]);
   const [scenario, setScenario] = useState<Array<Step>>([]);
+  const [stepOutput, setStepOutput] = useState<Array<StepOutput>>([]);
 
   useEffect(() => {
     // add a base value to each script
     const newScripts: Array<Step> = scriptData.scripts.map(script => {
       return {
+        id: makeId(6),
         name: script.name,
         description: script.description,
         command: script.command,
-        args: script.args.map(arg => { return { type: arg.type, description: arg.description, name: arg.name, value: arg.type === "string" ? "" : 0 } })
+        args: script.args.map(arg => { return { id: makeId(6), type: arg.type, description: arg.description, name: arg.name, value: arg.type === "string" ? "" : 0 } })
       }
     })
     setSteps(newScripts);
   }, [])
 
   const addToScenario = (step: Step) => {
-    setScenario(scenario.concat([step]))
+    // give the step it's own ID
+    let scenarioStep = { ...step, id: makeId(6) }
+    scenarioStep.args = scenarioStep.args.map(ss => { return { ...ss, id: makeId(6) } })
+    setScenario(scenario.concat([scenarioStep]));
   }
 
-  const removeAtIndex = (indexForRemoval: number) => {
-    // Removes the step at the given index
-    const newArray = scenario.slice(0, indexForRemoval).concat(scenario.slice(indexForRemoval + 1))
+  const removeAtId = (stepId: string) => {
+    // Removes the step with the given id
+    const newArray = scenario.filter(element => element.id !== stepId)
     setScenario(newArray);
   }
 
-  const updateScenarioStepValue = (stepIndex: number, argIndex: number, value: string | number) => {
+  const updateScenarioStepValue = (stepId: string, argId: string, value: string | number) => {
     const newArray = scenario.map((scenarioStep, i) => {
-      if (i !== stepIndex) {
+      if (scenarioStep.id !== stepId) {
         return scenarioStep;
       }
       const updatedStep = Object.assign({}, scenarioStep)
-      updatedStep.args[argIndex].value = value;
+      for (let sArg of updatedStep.args) {
+        if (sArg.id === argId) {
+          sArg.value = value
+        }
+      }
       return updatedStep;
     })
     setScenario(newArray)
@@ -61,19 +90,22 @@ export default function Home() {
   }
 
   const runScenario = async () => {
+    // clear step output if there is any
+    setStepOutput([]);
+    let output: Array<StepOutput> = []
     // runs each step in the scenario
     for (let scenarioStep of scenario) {
       const data = {
         command: scenarioStep.command,
         args: scenarioStep.args.map(arg => { return { type: arg.type, value: arg.value } })
       }
-      const response = await axios.post('http://localhost:8000/execute', data)
-      console.log('response', response)
+      const response = await axios.post('http://localhost:8000/execute', data);
+      output = output.concat([response.data.output])
     }
 
+    setStepOutput(output)
+
   }
-
-
 
   return (
     <div className={styles.container}>
@@ -89,7 +121,7 @@ export default function Home() {
             <p>Steps</p>
             {steps.map((step, i) => {
               return (
-                <div key={`step${i}`} className='bg-gray-100 drop-shadow-lg px-5 py-3 mb-6'>
+                <div key={step.id} className='bg-gray-100 drop-shadow-lg px-5 py-3 mb-6'>
                   <p className='font-bold mb-2'>{step.name}</p>
                   <p className='italic mb-2'>{step.description}</p>
                   <p className='font-mono mb-4 bg-gray-200 rounded-md px-3 py-1 text-blue-600'>{step.command}</p>
@@ -110,23 +142,33 @@ export default function Home() {
             <div>
               {scenario.map((scenarioStep, i) => {
                 return (
-                  <div key={`step${i}`} className='bg-gray-100 drop-shadow-lg px-5 py-3 mb-6'>
+                  <div key={`scenariostep${scenarioStep.id}`} className='bg-gray-100 drop-shadow-lg px-5 py-3 mb-6'>
                     <p className='font-bold mb-2'>{scenarioStep.name}</p>
                     <p className='italic mb-2'>{scenarioStep.description}</p>
                     <div className='flex flex-col pt-5'>
                       {scenarioStep.args?.map((arg, j) => {
                         return (
-                          <div key={`step${i}arg${j}`} className='mb-5'>
+                          <div key={`step${scenarioStep.id}arg${arg.id}`} className='mb-5'>
                             <p className='font-bold text-sm'>{`${arg.name} (${arg.type})`}</p>
                             <p className='text-sm'>{arg.description}</p>
-                            <input value={arg.value} onChange={(e) => updateScenarioStepValue(i, j, e.target.value)} key={`step${i}arg${j}`} />
+                            <input type={"text"} value={arg.value} onChange={(e) => updateScenarioStepValue(scenarioStep.id, arg.id, e.target.value)} />
                           </div>
                         )
                       })}
                     </div>
-                    <button onClick={() => removeAtIndex(i)} className='px-3 py-2 bg-red-300 rounded-lg'>
+                    <button onClick={() => removeAtId(scenarioStep.id)} className='px-3 py-2 bg-red-300 rounded-lg'>
                       remove
                     </button>
+
+                    <div>
+                      {/* Step output goes here */}
+                      {stepOutput[i] && (
+                        <div className={joinClassNames(stepOutput[i].stderr ? 'bg-red-200' : 'bg-green-200', 'px-3 py-3 flex flex-col')}>
+                          <p className={joinClassNames(stepOutput[i].stderr ? 'text-red-800' : 'text-green-800', 'text-sm')}>Output:</p>
+                          <p className='text-mono'>{stepOutput[i].stdout ? stepOutput[i].stdout : stepOutput[i].stderr}</p>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )
               })}

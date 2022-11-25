@@ -6,35 +6,24 @@ import bodyParser, { json } from 'body-parser';
 import { ExecuteCommandType } from './src/generated/interfaces';
 import { ExecuteCommandSchema } from './src/schemas';
 import cors from 'cors';
+import config from './src/config';
 
-dotenv.config();
+
 
 const app: Express = express();
-const port = process.env.PORT;
+const port = config.port;
 
 // enable cors
-app.use(cors());
-// @ts-ignore
-app.options('*', cors());
+app.use(cors({
+  origin: `http://localhost:${config.clientPort}`,
+  methods: "GET,POST",
+  credentials: true,
+  maxAge: 3600,
+}));
 
 // create application/json parser
 var jsonParser = bodyParser.json()
 
-app.get('/', (req: Request, res: Response) => {
-  res.send('Express + TypeScript Server!!');
-
-  exec("python3 example.py chine", (error: any, stdout: string, stderr: string) => {
-    if (error) {
-      console.log(`error: ${error.message}`);
-      return;
-    }
-    if (stderr) {
-      console.log(`stderr: ${stderr}`);
-      return;
-    }
-    console.log(`stdout: ${stdout}`);
-  });
-});
 
 app.post('/execute', jsonParser, async (req: Request, res: Response) => {
   const validatedParams: ExecuteCommandType = await ExecuteCommandSchema.validateAsync(req.body);

@@ -13,35 +13,23 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const dotenv_1 = __importDefault(require("dotenv"));
 const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 const body_parser_1 = __importDefault(require("body-parser"));
 const schemas_1 = require("./src/schemas");
 const cors_1 = __importDefault(require("cors"));
-dotenv_1.default.config();
+const config_1 = __importDefault(require("./src/config"));
 const app = (0, express_1.default)();
-const port = process.env.PORT;
+const port = config_1.default.port;
 // enable cors
-app.use((0, cors_1.default)());
-// @ts-ignore
-app.options('*', (0, cors_1.default)());
+app.use((0, cors_1.default)({
+    origin: `http://localhost:${config_1.default.clientPort}`,
+    methods: "GET,POST",
+    credentials: true,
+    maxAge: 3600,
+}));
 // create application/json parser
 var jsonParser = body_parser_1.default.json();
-app.get('/', (req, res) => {
-    res.send('Express + TypeScript Server!!');
-    exec("python3 example.py chine", (error, stdout, stderr) => {
-        if (error) {
-            console.log(`error: ${error.message}`);
-            return;
-        }
-        if (stderr) {
-            console.log(`stderr: ${stderr}`);
-            return;
-        }
-        console.log(`stdout: ${stdout}`);
-    });
-});
 app.post('/execute', jsonParser, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const validatedParams = yield schemas_1.ExecuteCommandSchema.validateAsync(req.body);
     // build the command
