@@ -107,6 +107,23 @@ export default function Home() {
 
   }
 
+  const clearScenario = () => {
+    // clear current output
+    setStepOutput([]);
+
+    // clear the values
+    let output: Array<Step> = [];
+
+    for (let scenarioStep of scenario) {
+      let data = Object.assign({}, scenarioStep)
+      data.args = data.args.map(arg => { return { type: arg.type, value: "", id: arg.id, description: arg.description, name: arg.name } })
+
+      output = output.concat([data])
+    }
+
+    setScenario(output)
+  }
+
   return (
     <div className={styles.container}>
       <Head>
@@ -117,55 +134,78 @@ export default function Home() {
 
       <main className={styles.main}>
         <div className='flex flex-row justify-start w-full h-full'>
-          <div className='border-2 border-transparent border-r-black pr-12'>
-            <p>Steps</p>
+          <div className='border-2 flex flex-col border-transparent border-r-black pr-12'>
+            <p className='text-xl font-medium self-center'>Steps</p>
             {steps.map((step, i) => {
               return (
-                <div key={step.id} className='bg-gray-100 drop-shadow-lg px-5 py-3 mb-6'>
-                  <p className='font-bold mb-2'>{step.name}</p>
-                  <p className='italic mb-2'>{step.description}</p>
-                  <p className='font-mono mb-4 bg-gray-200 rounded-md px-3 py-1 text-blue-600'>{step.command}</p>
-                  <button onClick={() => addToScenario(step)} className='px-3 py-2 bg-blue-300 rounded-lg'>
+                <div key={step.id}>
+                  <div className='bg-gray-200 w-80 px-5 py-5 rounded-t-lg'>
+                    <p className='font-bold text-lg mb-1'>{step.name}</p>
+                    <p className='italic mb-2 text-sm text-gray-600'>{step.description}</p>
+                    <p className="text-gray-600 font-bold mb-1">Script</p>
+                    <p className='font-mono mb-4 bg-white text-sm rounded-md px-3 py-1 text-indigo-500 font-semibold'>{step.command}</p>
+                    <p className="text-gray-600 font-bold mb-1">Inputs</p>
+                    <div>
+                      {step.args.map((arg, i) => (
+                        <p className='font-bold text-gray-600 text-sm mb-1' key={`${arg.id}-${i}`}>{arg.name}: <span className='capitalize font-normal'>{arg.type}</span></p>
+                      ))}
+                    </div>
+
+                  </div>
+                  <div onClick={() => addToScenario(step)} className='px-3 py-2 bg-indigo-300 rounded-b-lg mb-6 flex justify-center text-white font-semibold cursor-default'>
                     Add
-                  </button>
+                  </div>
                 </div>
               )
             })}
           </div>
-          <div>
-            <p>
-              scenario
-            </p>
-            <button onClick={runScenario} className='ml-10 px-3 bg-gray-300 rounded-full'>
-              Run
-            </button>
+          <div className='flex flex-col '>
+            <div className='flex flex-col  justify-center items-center'>
+              <p className='text-xl font-medium'>
+                Scenario
+              </p>
+
+            </div>
+            <div className='flex justify-end mb-6'>
+              <button onClick={clearScenario} className='px-5 py-2 bg-white border border-gray-400 rounded-lg text-gray-500 font-bold'>
+                Reset
+              </button>
+              <button onClick={runScenario} className='ml-5 px-5 py-2 bg-green-500 rounded-lg text-white font-bold'>
+                Run
+              </button>
+            </div>
+
+
+
             <div>
               {scenario.map((scenarioStep, i) => {
                 return (
-                  <div key={`scenariostep${scenarioStep.id}`} className='bg-gray-100 drop-shadow-lg px-5 py-3 mb-6'>
-                    <p className='font-bold mb-2'>{scenarioStep.name}</p>
-                    <p className='italic mb-2'>{scenarioStep.description}</p>
-                    <div className='flex flex-col pt-5'>
-                      {scenarioStep.args?.map((arg, j) => {
-                        return (
-                          <div key={`step${scenarioStep.id}arg${arg.id}`} className='mb-5'>
-                            <p className='font-bold text-sm'>{`${arg.name} (${arg.type})`}</p>
-                            <p className='text-sm'>{arg.description}</p>
-                            <input type={"text"} value={arg.value} onChange={(e) => updateScenarioStepValue(scenarioStep.id, arg.id, e.target.value)} />
-                          </div>
-                        )
-                      })}
-                    </div>
-                    <button onClick={() => removeAtId(scenarioStep.id)} className='px-3 py-2 bg-red-300 rounded-lg'>
-                      remove
-                    </button>
+                  <div className='w-full mb-6' key={`scenariostep${scenarioStep.id}`}>
+                    <div className='bg-gray-200 px-5 py-3 mb-3 rounded-lg'>
+                      <p className='font-bold mb-2 text-lg'>{scenarioStep.name}</p>
+                      <div className='flex flex-col pt-5'>
+                        {scenarioStep.args?.map((arg, j) => {
+                          return (
+                            <div key={`step${scenarioStep.id}arg${arg.id}`} className='mb-5'>
+                              <p className='font-bold text-sm text-gray-500'>{`${arg.name} (${arg.type})`}</p>
+                              <p className='text-sm italic text-gray-500'>{arg.description}</p>
+                              <input className='rounded-md px-2 py-1 border border-gray-300' type={"text"} value={arg.value} onChange={(e) => updateScenarioStepValue(scenarioStep.id, arg.id, e.target.value)} />
+                            </div>
+                          )
+                        })}
+                      </div>
+                      <button onClick={() => removeAtId(scenarioStep.id)} className='px-3 py-2 bg-red-300 rounded-lg'>
+                        remove
+                      </button>
 
+
+                    </div>
                     <div>
                       {/* Step output goes here */}
                       {stepOutput[i] && (
-                        <div className={joinClassNames(stepOutput[i].stderr ? 'bg-red-200' : 'bg-green-200', 'px-3 py-3 flex flex-col')}>
+                        <div className={joinClassNames(stepOutput[i].stderr ? 'bg-red-200' : 'bg-green-200', 'px-3 py-3 flex flex-col rounded-lg')}>
                           <p className={joinClassNames(stepOutput[i].stderr ? 'text-red-800' : 'text-green-800', 'text-sm')}>Output:</p>
-                          <p className='text-mono'>{stepOutput[i].stdout ? stepOutput[i].stdout : stepOutput[i].stderr}</p>
+                          <pre className='font-mono text-xs text-gray-800'>{stepOutput[i].stdout ? stepOutput[i].stdout : stepOutput[i].stderr}</pre>
                         </div>
                       )}
                     </div>
