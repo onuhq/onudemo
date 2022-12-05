@@ -2,24 +2,24 @@ import dotenv from 'dotenv';
 import path from 'path';
 import Joi from 'joi';
 
-dotenv.config({ path: path.join(__dirname, '../../.env') });
+// dotenv.config({ path: path.join(__dirname, '../../.env') });
 
-const envVarsSchema = Joi.object()
-  .keys({
-    CLIENT_PORT: Joi.number().default(3000),
-    PORT: Joi.number().default(8000),
-  })
-  .unknown();
+// const envVarsSchema = Joi.object()
+//   .keys({
+//     CLIENT_PORT: Joi.number().default(3000),
+//     PORT: Joi.number().default(8000),
+//   })
+//   .unknown();
 
-const { value: envVars, error } = envVarsSchema.prefs({ errors: { label: 'key' } }).validate(process.env);
+// const { value: envVars, error } = envVarsSchema.prefs({ errors: { label: 'key' } }).validate(process.env);
 
-if (error) {
-  throw new Error(`Config validation error: ${error.message}`);
-}
+// if (error) {
+//   throw new Error(`Config validation error: ${error.message}`);
+// }
 
 const config = {
-  clientPort: envVars.CLIENT_PORT,
-  port: envVars.PORT,
+  clientPort: 3000,
+  port: 8000,
 };
 
 export default config;

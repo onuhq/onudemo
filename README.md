@@ -40,16 +40,6 @@ In a new terminal window, cd into `onudemo/backend` and also run `yarn dev` to s
 You can now navigate to http://localhost:3000 to see the dashboard.
 
 
-### Create a .env file
-You'll need to create a `.env` in onudemo/backend with the following config. There's a .env.example file with an example config you can use
-
-```bash
-PORT=8000  # The port that the backend server should run on
-CLIENT_PORT=3000  # The port that the frontend app should run on
-```
-
-
-
 ## Getting Started
 
 First, run the development server:
