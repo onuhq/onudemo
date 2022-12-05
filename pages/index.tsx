@@ -141,7 +141,7 @@ export default function Home() {
                     </div>
 
                   </div>
-                  <div onClick={() => addToScenario(step)} className='px-3 py-2 bg-indigo-300 rounded-b-lg mb-6 flex justify-center text-white font-semibold cursor-default'>
+                  <div onClick={() => addToScenario(step)} className='px-3 py-2 bg-indigo-400 rounded-b-lg mb-6 flex justify-center text-white font-semibold cursor-pointer'>
                     Add
                   </div>
                 </div>
