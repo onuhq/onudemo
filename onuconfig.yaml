@@ -16,3 +16,7 @@ scripts:
   - type: string
     name: Friend name
     description: the name of the friend with the birthday
+- name: Generate types
+  command: ts-node ./src/scripts/generateTypes.ts
+  description: blahh
+  args: []

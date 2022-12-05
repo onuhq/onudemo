@@ -41,7 +41,7 @@ You can now navigate to http://localhost:3000 to see the dashboard.
 
 
 ### Create a .env file
-You'll need to create a `.env` in onudemo/backend with the folowing config
+You'll need to create a `.env` in onudemo/backend with the following config. There's a .env.example file with an example config you can use
 
 ```bash
 PORT=8000  # The port that the backend server should run on

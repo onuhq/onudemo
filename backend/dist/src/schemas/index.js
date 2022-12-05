@@ -12,7 +12,7 @@ let arg = joi_1.default.object().keys({
 exports.ExecuteCommandSchema = joi_1.default.object({
     command: joi_1.default.string()
         .min(1)
-        .max(30)
+        .max(100)
         .required(),
     args: joi_1.default.array()
         .items(arg)

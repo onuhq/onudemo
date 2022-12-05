@@ -8,7 +8,7 @@ let arg = Joi.object().keys({
 export const ExecuteCommandSchema = Joi.object({
   command: Joi.string()
     .min(1)
-    .max(30)
+    .max(100)
     .required(),
   args: Joi.array()
     .items(arg)

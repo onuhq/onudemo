@@ -33,7 +33,11 @@ app.post('/execute', jsonParser, async (req: Request, res: Response) => {
   if (validatedParams.args) {
 
     for (let arg of validatedParams.args) {
-      commandArgs += `${arg.value} `;
+      if (arg.type === 'string') {
+        commandArgs += `'${arg.value}' `;
+      } else {
+        commandArgs += `${arg.value} `;
+      }
     }
   }
 
