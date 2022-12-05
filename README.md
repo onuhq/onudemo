@@ -3,7 +3,7 @@
 ### Clone this repo
 
 ```bash
-git clone onudemo
+git clone git@github.com:onuhq/onudemo.git
 ```
 
 ### cd into the directory and install the dependncies using yarn
