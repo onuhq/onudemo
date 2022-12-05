@@ -1,4 +1,28 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# How to set up Onu:
+
+### Clone this repo
+
+```bash
+git clone onudemo
+```
+
+### cd into the directory and install the dependncies using yarn
+```bash
+cd onudemo/
+yarn # or npm install
+```
+
+### Install the backend dependencies
+```bash
+cd onudemo/backend
+yarn # or npm install
+```
+
+You can now navigate to http://localhost:3000 to see the dashboard.
+
+
+
+
 
 ## Getting Started
 

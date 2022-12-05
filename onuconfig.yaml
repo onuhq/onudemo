@@ -1,13 +1,13 @@
 scripts:
 - name: My script
-  command: python3 example.py
+  command: python3 ./examples/example.py
   description: Prints the name to the console
   args:
   - type: string
     name: Employee name
     description: the name of the employee to say 'woo' to
   - type: number
-    name: times
+    name: Times
     description: the number of times to say 'woo'
 - name: My other script!!
   command: python3 example2.py
