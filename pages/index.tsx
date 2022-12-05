@@ -110,18 +110,7 @@ export default function Home() {
   const clearScenario = () => {
     // clear current output
     setStepOutput([]);
-
-    // clear the values
-    let output: Array<Step> = [];
-
-    for (let scenarioStep of scenario) {
-      let data = Object.assign({}, scenarioStep)
-      data.args = data.args.map(arg => { return { type: arg.type, value: "", id: arg.id, description: arg.description, name: arg.name } })
-
-      output = output.concat([data])
-    }
-
-    setScenario(output)
+    setScenario([]);
   }
 
   return (
