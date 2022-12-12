@@ -16,4 +16,11 @@ scripts:
   - type: string
     name: Email
     description: the email of the new user
+- name: Create ride!!!!
+  command: ts-node ./examples/create_ride.ts
+  description: Adds rides to a user's account
+  args:
+  - type: number
+    name: Amount
+    description: The number of rides to add
 

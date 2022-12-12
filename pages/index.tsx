@@ -113,6 +113,8 @@ export default function Home() {
     setScenario([]);
   }
 
+  const runButtonDisabled = scenario.length === 0;
+
   return (
     <div className={styles.container}>
       <Head>
@@ -157,9 +159,9 @@ export default function Home() {
             </div>
             <div className='flex justify-end mb-6'>
               <button onClick={clearScenario} className='px-5 py-2 bg-white border border-gray-400 rounded-lg text-gray-500 font-bold'>
-                Reset
+                Clear
               </button>
-              <button onClick={runScenario} className='ml-5 px-5 py-2 bg-green-500 rounded-lg text-white font-bold'>
+              <button disabled={runButtonDisabled} onClick={runScenario} className={joinClassNames(runButtonDisabled ? 'bg-gray-500' : 'bg-green-500', 'ml-5 px-5 py-2 rounded-lg text-white font-bold')}>
                 Run
               </button>
             </div>

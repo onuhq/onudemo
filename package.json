@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "node ./scripts/yaml-convert.js -- watch & next dev",
+    "dev": "node ./scripts/yaml-convert.js watch & next dev",
     "build": "next build",
-    "start": "node ./scripts/yaml-convert.js && next start",
+    "start": "ode ./scripts/yaml-convert.js && next start",
     "lint": "next lint",
     "yaml-convert": "node ./scripts/yaml-convert.js"
   },

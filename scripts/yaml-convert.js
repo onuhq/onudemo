@@ -19,9 +19,11 @@ function watch() {
 
 function convert() {
   try {
+    console.log('converting!!!')
     const json = yaml.load(fs.readFileSync('./onuconfig.yaml', 'utf8'));
     fs.writeFileSync('./onuconfig.json', JSON.stringify(json));
   } catch (e) {
+    console.log('error converting lol')
     console.log(e);
   }
 }
