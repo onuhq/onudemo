@@ -53,7 +53,7 @@ export default function Home() {
         name: script.name,
         description: script.description,
         command: script.command,
-        args: script.args.map(arg => { return { id: makeId(6), type: arg.type, description: arg.description, name: arg.name, value: arg.type === "string" ? "" : 0 } })
+        args: script.args ? script.args.map(arg => { return { id: makeId(6), type: arg.type, description: arg.description, name: arg.name, value: arg.type === "string" ? "" : 0 } }) : []
       }
     })
     setSteps(newScripts);
@@ -92,15 +92,22 @@ export default function Home() {
   const runScenario = async () => {
     // clear step output if there is any
     setStepOutput([]);
+    let userId = "unset";
     let output: Array<StepOutput> = []
     // runs each step in the scenario
     for (let scenarioStep of scenario) {
       const data = {
+        userId,
         command: scenarioStep.command,
         args: scenarioStep.args.map(arg => { return { type: arg.type, value: arg.value } })
       }
       const response = await axios.post('http://localhost:8000/execute', data);
       output = output.concat([response.data.output])
+
+      // Terrible hack to get demo to work
+      if (response.data.output.stdout.includes("Created user ")) {
+        userId = response.data.output.stdout.trim().split(" ")[2]
+      }
     }
 
     setStepOutput(output)

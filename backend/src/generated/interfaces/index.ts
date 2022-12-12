@@ -9,4 +9,5 @@ export interface ExecuteCommandType {
     value?: string | number;
   })[];
   command: string;
+  userId: string;
 }

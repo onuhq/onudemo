@@ -41,7 +41,7 @@ app.post('/execute', jsonParser, async (req: Request, res: Response) => {
     }
   }
 
-  const command = `${validatedParams.command} ${commandArgs}`.trimEnd()
+  const command = `${validatedParams.command} ${validatedParams.userId} ${commandArgs}`.trimEnd()
 
   let output = {
     stdout: '',

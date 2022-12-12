@@ -6,6 +6,10 @@ let arg = Joi.object().keys({
 })
 
 export const ExecuteCommandSchema = Joi.object({
+  userId: Joi.string()
+    .min(1)
+    .max(100)
+    .required(),
   command: Joi.string()
     .min(1)
     .max(100)

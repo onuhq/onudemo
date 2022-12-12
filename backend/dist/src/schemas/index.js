@@ -10,6 +10,10 @@ let arg = joi_1.default.object().keys({
     value: [joi_1.default.string(), joi_1.default.number()],
 });
 exports.ExecuteCommandSchema = joi_1.default.object({
+    userId: joi_1.default.string()
+        .min(1)
+        .max(100)
+        .required(),
     command: joi_1.default.string()
         .min(1)
         .max(100)

@@ -1,26 +1,19 @@
 scripts:
-- name: My script
-  command: python3 ./examples/example.py
-  description: Prints the name to the console
-  args:
-  - type: string
-    name: Employee name
-    description: the name of the employee to say 'woo' to
-  - type: number
-    name: Times
-    description: the number of times to say 'woo'
 - name: Create test user
-  command: ts-node ./examples/create_user.ts
+  command: python3  ./examples/create_user.py
   description: Creates a test user and prints the info to the console
   args:
   - type: string
     name: Email
     description: the email of the new user
-- name: Create ride!!!!
-  command: ts-node ./examples/create_ride.ts
-  description: Adds rides to a user's account
+- name: Create rides
+  command: python3  ./examples/create_rides.py
+  description: Adds some rides to a user's account
   args:
   - type: number
     name: Amount
     description: The number of rides to add
+- name: Make admin
+  command: python3  ./examples/make_admin.py
+  description: Makes the user an admin user
 
