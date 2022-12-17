@@ -29,6 +29,23 @@ function joinClassNames(...classes: Array<string | boolean | undefined>) {
   return classes.filter(Boolean).join(' ')
 }
 
+const PlayIcon = () => {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFFFFF" className="w-6 h-6">
+      <path fillRule="evenodd" d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.348c1.295.712 1.295 2.573 0 3.285L7.28 19.991c-1.25.687-2.779-.217-2.779-1.643V5.653z" clipRule="evenodd" />
+    </svg>
+
+  )
+}
+
+const XIcon = () => {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#6b7280" className="w-6 h-6">
+      <path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm-1.72 6.97a.75.75 0 10-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 101.06 1.06L12 13.06l1.72 1.72a.75.75 0 101.06-1.06L13.06 12l1.72-1.72a.75.75 0 10-1.06-1.06L12 10.94l-1.72-1.72z" clipRule="evenodd" />
+    </svg>
+  )
+}
+
 const makeId = (length: number) => {
   var result = '';
   var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -44,6 +61,7 @@ export default function Home() {
   const [steps, setSteps] = useState<Array<Step>>([]);
   const [scenario, setScenario] = useState<Array<Step>>([]);
   const [stepOutput, setStepOutput] = useState<Array<StepOutput>>([]);
+  const [scenarioExecuted, setScenarioExecuted] = useState(false);
 
   useEffect(() => {
     // add a base value to each script
@@ -60,6 +78,12 @@ export default function Home() {
   }, [])
 
   const addToScenario = (step: Step) => {
+    if (scenarioExecuted) {
+      // The user has already executed their scenario. Show an alert telling them to 
+      // Clear the current scenario before making updates
+      alert('You must clear your existing scenario before creating a new one')
+      return;
+    }
     // give the step it's own ID
     let scenarioStep = { ...step, id: makeId(6) }
     scenarioStep.args = scenarioStep.args.map(ss => { return { ...ss, id: makeId(6) } })
@@ -111,6 +135,7 @@ export default function Home() {
     }
 
     setStepOutput(output)
+    setScenarioExecuted(true);
 
   }
 
@@ -118,6 +143,7 @@ export default function Home() {
     // clear current output
     setStepOutput([]);
     setScenario([]);
+    setScenarioExecuted(false);
   }
 
   const runButtonDisabled = scenario.length === 0;
@@ -157,7 +183,7 @@ export default function Home() {
               )
             })}
           </div>
-          <div className='flex flex-col '>
+          <div className='flex flex-col w-full px-3'>
             <div className='flex flex-col  justify-center items-center'>
               <p className='text-xl font-medium'>
                 Scenario
@@ -165,11 +191,11 @@ export default function Home() {
 
             </div>
             <div className='flex justify-end mb-6'>
-              <button onClick={clearScenario} className='px-5 py-2 bg-white border border-gray-400 rounded-lg text-gray-500 font-bold'>
+              <button onClick={clearScenario} className='px-3 py-2 bg-white border border-gray-400 rounded-lg text-gray-500 font-bold'>
                 Clear
               </button>
-              <button disabled={runButtonDisabled} onClick={runScenario} className={joinClassNames(runButtonDisabled ? 'bg-gray-500' : 'bg-green-500', 'ml-5 px-5 py-2 rounded-lg text-white font-bold')}>
-                Run
+              <button disabled={runButtonDisabled} onClick={runScenario} className={joinClassNames(runButtonDisabled ? 'bg-gray-500' : 'bg-green-500', 'ml-5 px-5 py-2 rounded-lg text-white font-bold flex flex-row')}>
+                Run <PlayIcon />
               </button>
             </div>
 
@@ -180,7 +206,15 @@ export default function Home() {
                 return (
                   <div className='w-full mb-6' key={`scenariostep${scenarioStep.id}`}>
                     <div className='bg-gray-200 px-5 py-3 mb-3 rounded-lg'>
-                      <p className='font-bold mb-2 text-lg'>{scenarioStep.name}</p>
+                      <div className='flex flex-row w-full justify-between'>
+
+                        <p className='font-bold mb-2 text-lg'>{scenarioStep.name}</p>
+                        <div onClick={() => removeAtId(scenarioStep.id)}>
+                          <XIcon />
+                        </div>
+
+                      </div>
+
                       <div className='flex flex-col pt-5'>
                         {scenarioStep.args?.map((arg, j) => {
                           return (
@@ -192,9 +226,7 @@ export default function Home() {
                           )
                         })}
                       </div>
-                      <button onClick={() => removeAtId(scenarioStep.id)} className='px-3 py-2 bg-red-300 rounded-lg'>
-                        remove
-                      </button>
+
 
 
                     </div>
