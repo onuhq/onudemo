@@ -585,6 +585,18 @@ video {
   margin-left: 0.25rem;
 }
 
+.mt-32{
+  margin-top: 8rem;
+}
+
+.mb-32{
+  margin-bottom: 8rem;
+}
+
+.mb-16{
+  margin-bottom: 4rem;
+}
+
 .flex{
   display: flex;
 }
@@ -663,6 +675,14 @@ video {
 
 .self-center{
   align-self: center;
+}
+
+.overflow-auto{
+  overflow: auto;
+}
+
+.overflow-scroll{
+  overflow: scroll;
 }
 
 .rounded-md{

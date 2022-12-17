@@ -190,7 +190,7 @@ export default function Home() {
       <main className={styles.main}>
         <div className='flex flex-row justify-start w-full h-full'>
           <div className='border-2 flex flex-col border-transparent border-r-black pr-12'>
-            <p className='text-xl font-medium self-center'>Steps</p>
+            <p className='text-xl font-medium self-center mb-16'>Steps</p>
             {steps.map((step, i) => {
               return (
                 <div key={step.id}>
