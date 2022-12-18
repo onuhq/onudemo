@@ -247,6 +247,7 @@ export default function Home() {
                         </div>}
 
                       </div>
+                      <p className='text-sm italic text-gray-600'>{scenarioStep.description}</p>
 
                       <div className='flex flex-col pt-5'>
                         {scenarioStep.args?.map((arg, j) => {
