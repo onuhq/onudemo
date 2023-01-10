@@ -310,7 +310,7 @@ export default function Home() {
                 Clear <RefreshIcon classes={"w-5 h-5 ml-2"} />
               </button>
               <button disabled={runButtonDisabled} onClick={runScenario} className={joinClassNames(runButtonDisabled ? 'bg-gray-500' : 'bg-green-500', 'ml-5 px-3 py-2 rounded-lg text-white font-bold flex flex-row items-center')}>
-                Load
+                Run <PlayIcon classes={"w-6 h-6 ml-1"} />
               </button>
             </div>
 
