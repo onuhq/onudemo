@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import styles from '../styles/Home.module.css'
 import scriptData from '../onuconfig.json'
 import axios from 'axios';
+import Sidebar from '../components/Sidebar';
+import { useRouter } from 'next/router'
 
 interface CommandArg {
   id: string;
@@ -77,6 +79,15 @@ const RefreshIcon = ({ classes }: IconProps) => {
   )
 }
 
+const PencilIcon = ({ classes }: IconProps) => {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={classes}>
+      <path d="M21.731 2.269a2.625 2.625 0 00-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 000-3.712zM19.513 8.199l-3.712-3.712-12.15 12.15a5.25 5.25 0 00-1.32 2.214l-.8 2.685a.75.75 0 00.933.933l2.685-.8a5.25 5.25 0 002.214-1.32L19.513 8.2z" />
+    </svg>
+
+  )
+}
+
 const makeId = (length: number) => {
   var result = '';
   var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -87,18 +98,37 @@ const makeId = (length: number) => {
   return result;
 }
 
+interface SavedScenario {
+  id: string;
+  scenarioName: string;
+  stepIds: Array<string>;
+}
+
 export default function Home() {
+  const initialScenarioName = 'Untitled Scenario';
+  const router = useRouter()
+
 
   const [steps, setSteps] = useState<Array<Step>>([]);
   const [scenario, setScenario] = useState<Array<Step>>([]);
   const [stepOutput, setStepOutput] = useState<Array<StepOutput>>([]);
   const [scenarioExecuted, setScenarioExecuted] = useState(false);
+  const [scenarioName, setScenarioName] = useState(initialScenarioName);
+  const [scenarioNameEditing, setScenarioNameEditing] = useState(false);
+
+  const getStepById = (id: string, givenSteps: Array<Step> | undefined): Step | null => {
+    if (!givenSteps) {
+      givenSteps = steps;
+    }
+    const filtered = givenSteps.filter(step => step.id === id);
+    return filtered ? filtered[0] : null;
+  }
 
   useEffect(() => {
     // add a base value to each script
     const newScripts: Array<Step> = scriptData.scripts.map(script => {
       return {
-        id: makeId(6),
+        id: script.id,
         name: script.name,
         description: script.description,
         command: script.command,
@@ -106,7 +136,39 @@ export default function Home() {
       }
     })
     setSteps(newScripts);
+
+    if (router.query && router.query.savedScenario) {
+      let scenarios: string | null | Array<SavedScenario> = localStorage.getItem('onu-scenarios');
+      if (!scenarios) {
+        scenarios = []
+      } else {
+        scenarios = JSON.parse(scenarios) as Array<SavedScenario>
+      }
+
+      const filteredScenarios = scenarios.filter(ss => ss.id == router.query.savedScenario)
+      const savedScenario = filteredScenarios ? filteredScenarios[0] : null;
+
+
+      if (savedScenario) {
+        let savedSteps = []
+        for (let stepId of savedScenario.stepIds) {
+          const step = getStepById(stepId, newScripts);
+          if (step) {
+            savedSteps.push(stepToScenario(step))
+          }
+        }
+        setScenarioName(savedScenario.scenarioName);
+        setScenario(savedSteps);
+      }
+
+    }
   }, [])
+
+  const stepToScenario = (step: Step): Step => {
+    let scenarioStep = { ...step, id: `step-${step.id}` }
+    scenarioStep.args = scenarioStep.args.map(ss => { return { ...ss, id: makeId(6) } })
+    return scenarioStep;
+  }
 
   const addToScenario = (step: Step) => {
     if (scenarioExecuted) {
@@ -115,9 +177,7 @@ export default function Home() {
       alert('You must clear your existing scenario before creating a new one')
       return;
     }
-    // give the step it's own ID
-    let scenarioStep = { ...step, id: makeId(6) }
-    scenarioStep.args = scenarioStep.args.map(ss => { return { ...ss, id: makeId(6) } })
+    let scenarioStep = stepToScenario(step)
     setScenario(scenario.concat([scenarioStep]));
   }
 
@@ -132,7 +192,7 @@ export default function Home() {
       if (scenarioStep.id !== stepId) {
         return scenarioStep;
       }
-      const updatedStep = Object.assign({}, scenarioStep)
+      const updatedStep: any = Object.assign({}, scenarioStep)
       for (let sArg of updatedStep.args) {
         if (sArg.id === argId) {
           sArg.value = value
@@ -175,6 +235,29 @@ export default function Home() {
     setStepOutput([]);
     setScenario([]);
     setScenarioExecuted(false);
+    setScenarioName(initialScenarioName);
+    setScenarioNameEditing(false);
+  }
+
+  const saveScenario = () => {
+    // save scenario data to localStorage
+    const scenarioState = {
+      id: makeId(7),
+      scenarioName,
+      stepIds: scenario.map(step => step.id.slice(5))
+    }
+    let scenarios: string | null | Array<any> = localStorage.getItem('onu-scenarios');
+    if (!scenarios) {
+      scenarios = []
+    } else {
+      scenarios = JSON.parse(scenarios)
+    }
+    // @ts-ignore
+    scenarios = scenarios.concat([scenarioState])
+
+    localStorage.setItem('onu-scenarios', JSON.stringify(scenarios))
+
+    alert('Scenario saved!')
   }
 
   const runButtonDisabled = scenario.length === 0;
@@ -189,7 +272,8 @@ export default function Home() {
 
       <main className={styles.main}>
         <div className='flex flex-row justify-start w-full h-full'>
-          <div className='border-2 flex flex-col border-transparent border-r-black pr-12'>
+          <Sidebar />
+          <div className='border-2 px-10 pt-10 flex flex-col border-transparent border-r-black'>
             <p className='text-xl font-medium self-center mb-16'>Steps</p>
             {steps.map((step, i) => {
               return (
@@ -214,7 +298,7 @@ export default function Home() {
               )
             })}
           </div>
-          <div className='flex flex-col w-full px-3'>
+          <div className='flex flex-col w-full px-3 pt-10'>
             <div className='flex flex-col  justify-center items-center'>
               <p className='text-xl font-medium'>
                 Scenario
@@ -233,6 +317,23 @@ export default function Home() {
 
 
             <div>
+              {scenario.length > 0 && <div className='flex flex-row items-center mb-8 w-full'>
+                <p className='cursor-default'>Scenario Name:</p>
+                {scenarioNameEditing ? (
+                  <div className=' flex flex-row'>
+                    <input value={scenarioName} onChange={(e) => setScenarioName(e.target.value)} className='rounded-md px-2 py-1 border border-gray-300 ml-2 w-96' type="text" />
+                    <button onClick={() => setScenarioNameEditing(false)} className='bg-blue-500 rounded-lg px-2 py-1 text-blue-100 ml-3'>Done</button>
+                  </div>)
+                  :
+                  <div className='flex flex-row items-center'>
+                    <p className='ml-2 cursor-default'>{scenarioName}</p>
+                    <div onClick={() => setScenarioNameEditing(true)} className='ml-2 cursor-pointer'>
+                      <PencilIcon classes='w-4 h-4 text-indigo-500' />
+                    </div>
+                  </div>
+                }
+              </div>}
+
               {scenario.map((scenarioStep, i) => {
                 const isSuccess = stepOutput[i] && !!stepOutput[i].stdout;
                 const isFailure = stepOutput[i] && !!stepOutput[i].stderr;
@@ -279,6 +380,9 @@ export default function Home() {
                   </div>
                 )
               })}
+              {scenario.length > 0 &&
+                <button onClick={saveScenario} className='bg-blue-500 px-3 py-2 rounded-lg text-white font-bold flex flex-row items-center'>Save scenario</button>
+              }
             </div>
           </div>
 
