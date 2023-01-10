@@ -118,8 +118,7 @@ export default function Scenarios() {
 
                   </div>
                   <div onClick={() => runScenario(scenario.id)} className='px-3 py-2 bg-indigo-400 rounded-b-lg mb-6 flex justify-center text-white font-semibold cursor-pointer'>
-                    Run
-                    <PlayIcon classes='h-6 w-6 ml-2' />
+                    Load
                   </div>
                 </div>
               )

@@ -1,8 +1,8 @@
 scripts:
 - id: create-user
-  name: Create test user
+  name: Create user
   command: python3  ./examples/create_user.py
-  description: Creates a test user and prints the info to the console
+  description: Creates a user and prints the info to the console
   args:
   - type: string
     name: Email
