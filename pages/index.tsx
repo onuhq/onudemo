@@ -309,6 +309,8 @@ export default function Home() {
               <button onClick={clearScenario} className='px-3 py-2 bg-white border-2 border-gray-400 rounded-lg text-gray-500 font-bold flex flex-row items-center'>
                 Clear <RefreshIcon classes={"w-5 h-5 ml-2"} />
               </button>
+              <button disabled={scenario.length === 0} onClick={saveScenario} className={joinClassNames(scenario.length > 0 ? 'bg-blue-500' : 'bg-gray-500', 'ml-5 px-3 py-2 rounded-lg text-white font-bold flex flex-row items-center')}>Save</button>
+
               <button disabled={runButtonDisabled} onClick={runScenario} className={joinClassNames(runButtonDisabled ? 'bg-gray-500' : 'bg-green-500', 'ml-5 px-3 py-2 rounded-lg text-white font-bold flex flex-row items-center')}>
                 Run <PlayIcon classes={"w-6 h-6 ml-1"} />
               </button>
@@ -380,9 +382,6 @@ export default function Home() {
                   </div>
                 )
               })}
-              {scenario.length > 0 &&
-                <button onClick={saveScenario} className='bg-blue-500 px-3 py-2 rounded-lg text-white font-bold flex flex-row items-center'>Save scenario</button>
-              }
             </div>
           </div>
 
