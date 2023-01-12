@@ -37,6 +37,21 @@ const WORKFLOWS = [
       }
     ]
 
+  },
+  {
+    id: "flag_user",
+    name: "Flag user into feature",
+    description: "Turns on a feature flag for a given user",
+    command: "python3 flip_ff.py",
+    args: [
+      {
+        id: 'user_id',
+        name: "User ID",
+        description: "ID of the user to turn the flag on for",
+        type: "string",
+      }
+    ]
+
   }
 ]
 
