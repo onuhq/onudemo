@@ -8,8 +8,8 @@ const Sidebar = () => {
       <Link href="/scenarios"><div className='self-center mt-20 hover:bg-gray-400 w-full py-3 px-5 cursor-pointer'>
         <p>My Scenarios</p>
       </div></Link>
-      <Link href="/workflows"><div className='self-center mt- hover:bg-gray-400 w-full py-3 px-5 cursor-pointer'>
-        <p>Workflows</p>
+      <Link href="/tasks"><div className='self-center mt- hover:bg-gray-400 w-full py-3 px-5 cursor-pointer'>
+        <p>Tasks</p>
       </div></Link>
 
     </div>
